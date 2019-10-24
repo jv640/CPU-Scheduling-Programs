@@ -1,0 +1,2 @@
+FCFS is a simple cpu scheduling algorithm.
+fcfs_disk is added to explain disk scheduling to

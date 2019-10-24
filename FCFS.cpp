@@ -1,83 +1,70 @@
-#include<bits/stdc++.h>
+#include<iostream> 
+using namespace std; 
 
-using namespace std;
+void findWaitingTime(int processes[], int n, int bt[], 
+								int wt[], int at[]) 
+{ 
+	int service_time[n]; 
+	service_time[0] = 0; 
+	wt[0] = 0; 
 
-struct process {
-	int pid;
-	int AT;
-	int BT;
-	int WT;
-	int TAT;
-	};
+	for (int i = 1; i < n ; i++) 
+	{ 
+ 
+		service_time[i] = service_time[i-1] + bt[i-1]; 
 
-bool comp(process a, process b)
-{
-	return	a.AT<b.AT; //sorting on basis of Arrival time
-}
+		wt[i] = service_time[i] - at[i]; 
 
-bool comp1(process a, process b)
-{
-	return	a.pid<b.pid;	//sorting on basis of Process ID
-}
+		if (wt[i] < 0) 
+			wt[i] = 0; 
+	} 
+} 
 
-void show(process proc[], int n)
-{
-	float AWT=0,ATT=0;	//avg waiting time & avg turn around time
-	cout<<"\n\nPid\tAT\tBT\tWT\tTAT\n";
-	for(int i=0;i<n;i++)
-	{
-		cout<<proc[i].pid<<"\t"<<proc[i].AT<<"\t"<<proc[i].BT<<"\t"<<proc[i].WT<<"\t"<<proc[i].TAT<<"\n";
-		AWT+=proc[i].WT;
-		ATT+=proc[i].TAT;
-	}
-	cout<<"\nAverage Waiting Time is "<<AWT/n<<", and Average turn around time is "<<ATT/n;
-}
+void findTurnAroundTime(int processes[], int n, int bt[], 
+									int wt[], int tat[]) 
+{ 
+	// Calculating turnaround time by adding bt[i] + wt[i] 
+	for (int i = 0; i < n ; i++) 
+		tat[i] = bt[i] + wt[i]; 
+} 
 
-void fcfs(process proc[],int n)
-{
-	int TT=1;	//total time starting from 1
-	for(int i=0;i<n;i++)
-	{
-		if(TT>=proc[i].AT)
-		{
-		TT+=proc[i].BT;
-		proc[i].TAT=TT-proc[i].AT;
-		proc[i].WT=proc[i].TAT-proc[i].BT;
-		}
-		else{
-		TT++;
-		i--;
-		}
-	}
+void findavgTime(int processes[], int n, int bt[], int at[]) 
+{ 
+	int wt[n], tat[n]; 
 
-	sort(proc,proc+n,comp1); //sorting on basis of Process ID
-	
-	show(proc,n);
-}
+	findWaitingTime(processes, n, bt, wt, at); 
+ 
+	findTurnAroundTime(processes, n, bt, wt, tat); 
+	cout << "Processes " << " Burst Time " << " Arrival Time "
+		<< " Waiting Time " << " Turn-Around Time "
+		<< " Completion Time \n"; 
+	int total_wt = 0, total_tat = 0; 
+	for (int i = 0 ; i < n ; i++) 
+	{ 
+		total_wt = total_wt + wt[i]; 
+		total_tat = total_tat + tat[i]; 
+		int compl_time = tat[i] + at[i]; 
+		cout << " " << i+1 << "\t\t" << bt[i] << "\t\t"
+			<< at[i] << "\t\t" << wt[i] << "\t\t "
+			<< tat[i] << "\t\t " << compl_time << endl; 
+	} 
 
-int main()
-{
-	//taking number of processes from user in nop
-	
-	cout<<"\nEnter the number of processes : ";
-	int nop;
-	cin>>nop;
-	
-	// Making an array of process structure
-	
-	process proc[nop];
-	
-	//taking values in process
-	for(int i=0;i<nop;i++)
-	{
-		cout<<"\nEnter the process ID, AT, BT in " << i+1 <<" process in respective order : ";
-		cin>>proc[i].pid>>proc[i].AT>>proc[i].BT;
-		proc[i].WT=proc[i].TAT=0;
-	}
-	
-	//sorting processes on basis of Arrival time 
-	sort(proc,proc+nop,comp);
-	
-	fcfs(proc,nop);
+	cout << "Average waiting time = "
+		<< (float)total_wt / (float)n; 
+	cout << "\nAverage turn around time = "
+		<< (float)total_tat / (float)n; 
+} 
 
-}
+int main() 
+{ 
+
+	int processes[] = {1, 2, 3}; 
+	int n = sizeof processes / sizeof processes[0];  
+	int burst_time[] = {5, 9, 6}; 
+
+	int arrival_time[] = {0, 3, 6}; 
+
+	findavgTime(processes, n, burst_time, arrival_time); 
+
+	return 0; 
+} 
